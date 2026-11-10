@@ -1,0 +1,74 @@
+[
+  {
+    "id": "c1",
+    "city": "*",
+    "brand": "Kia Rio",
+    "class": "Эконом",
+    "seats": 5,
+    "gearbox": "Автомат",
+    "fuel": "Бензин",
+    "price_day": 2500,
+    "photo": "img/cars/c1.jpg",
+    "photo_credit": "Wikimedia Commons"
+  },
+  {
+    "id": "c2",
+    "city": "*",
+    "brand": "Hyundai Solaris",
+    "class": "Эконом",
+    "seats": 5,
+    "gearbox": "Механика",
+    "fuel": "Бензин",
+    "price_day": 2200,
+    "photo": "img/cars/c2.jpg",
+    "photo_credit": "Wikimedia Commons"
+  },
+  {
+    "id": "c3",
+    "city": "*",
+    "brand": "Toyota Camry",
+    "class": "Комфорт",
+    "seats": 5,
+    "gearbox": "Автомат",
+    "fuel": "Бензин",
+    "price_day": 4500,
+    "photo": "img/cars/c3.jpg",
+    "photo_credit": "Wikimedia Commons"
+  },
+  {
+    "id": "c4",
+    "city": "*",
+    "brand": "Skoda Octavia",
+    "class": "Комфорт",
+    "seats": 5,
+    "gearbox": "Автомат",
+    "fuel": "Бензин",
+    "price_day": 4000,
+    "photo": "img/cars/c4.jpg",
+    "photo_credit": "Wikimedia Commons"
+  },
+  {
+    "id": "c5",
+    "city": "*",
+    "brand": "Toyota RAV4",
+    "class": "Внедорожник",
+    "seats": 5,
+    "gearbox": "Автомат",
+    "fuel": "Бензин",
+    "price_day": 6500,
+    "photo": "img/cars/c5.jpg",
+    "photo_credit": "Wikimedia Commons"
+  },
+  {
+    "id": "c6",
+    "city": "*",
+    "brand": "Mercedes V-Class",
+    "class": "Минивэн",
+    "seats": 7,
+    "gearbox": "Автомат",
+    "fuel": "Дизель",
+    "price_day": 10000,
+    "photo": "img/cars/c6.jpg",
+    "photo_credit": "Wikimedia Commons"
+  }
+]

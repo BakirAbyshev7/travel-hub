@@ -1,0 +1,8 @@
+data/users.json
+data/sessions.json
+data/orders.json
+data/trips.json
+data/bookings.json
+.env
+__pycache__/
+.DS_Store

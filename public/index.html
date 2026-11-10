@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Путник — билеты, отели, авто</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap top-in">
+    <a class="logo" href="/"><span class="logo-mark">✈</span>путник</a>
+    <nav id="steps" class="tabs">
+      <button data-step="tickets" class="active"><span>✈️</span>Авиабилеты</button>
+      <button data-step="hotels"><span>🏨</span>Отели</button>
+      <button data-step="cars"><span>🚗</span>Аренда авто</button>
+    </nav>
+    <div class="top-right"><span class="cur">с KGS</span><span class="lang">RU</span>
+      <button class="auth-btn" id="authBtn">Войти</button>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <h1 id="heroTitle">Дешёвые авиабилеты</h1>
+    <p id="heroSub" class="hero-sub">Сравниваем цены авиакомпаний, а потом подбираем отель и машину на месте</p>
+
+    <form id="ticketForm" class="search step-form active" data-for="tickets">
+      <label class="f"><small>Откуда</small><input id="from" autocomplete="off" placeholder="Город вылета" required><b class="iata" id="fromCode"></b><ul class="sug" id="fromSug"></ul></label>
+      <button type="button" class="swap" id="swap" title="Поменять местами">⇄</button>
+      <label class="f"><small>Куда</small><input id="to" autocomplete="off" placeholder="Город прилёта" required><b class="iata" id="toCode"></b><ul class="sug" id="toSug"></ul></label>
+      <label class="f"><small>Когда · необязательно</small><input type="date" id="date"></label>
+      <label class="f"><small>Обратно · необязательно</small><input type="date" id="dateBack"></label>
+      <button class="go">Найти билеты</button>
+    </form>
+
+    <form id="hotelForm" class="search step-form" data-for="hotels">
+      <label class="f wide"><small>Город или курорт</small><input id="hcity" placeholder="Например, Сочи" required></label>
+      <label class="f"><small>Заезд</small><input type="date" id="hin"></label>
+      <label class="f"><small>Выезд</small><input type="date" id="hout"></label>
+      <label class="f"><small>Гости</small><select id="guests"><option>1 взрослый</option><option selected>2 взрослых</option><option>3 взрослых</option><option>4 взрослых</option></select></label>
+      <button class="go">Найти отели</button>
+    </form>
+
+    <form id="carSearch" class="search step-form" data-for="cars">
+      <label class="f wide"><small>Место получения</small><input id="ccity" placeholder="Город"></label>
+      <label class="f"><small>Получение</small><input type="date" id="cfrom"></label>
+      <label class="f"><small>Возврат</small><input type="date" id="cto"></label>
+      <button class="go">Показать авто</button>
+    </form>
+
+    <form class="step-form" data-for="account"></form>
+
+    <ol class="stepper" id="stepper">
+      <li data-step="tickets"><i>1</i>Перелёт</li>
+      <li data-step="hotels"><i>2</i>Отель</li>
+      <li data-step="cars"><i>3</i>Автомобиль</li>
+    </ol>
+  </div>
+</section>
+
+<main class="wrap layout">
+  <div class="content">
+    <section id="tickets" class="panel active">
+      <div class="toolbar" id="ticketBar" hidden>
+        <div class="sorts">
+          <button class="chip" data-sort="departure">Ближайшие</button>
+          <button class="chip active" data-sort="price">Самый дешёвый</button>
+          <button class="chip" data-sort="duration">Самый быстрый</button>
+        </div>
+        <label class="check"><input type="checkbox" id="directOnly"> Только прямые</label>
+      </div>
+      <div id="ticketMsg" class="msg"></div>
+      <div id="ticketList" class="list"></div>
+      <div class="empty" id="ticketEmpty">
+        <div class="empty-ico">🧳</div>
+        <h3>Куда летим?</h3>
+        <p>Введите города — покажем ближайшие рейсы. Дату можно не указывать.</p>
+      </div>
+    </section>
+
+    <section id="hotels" class="panel">
+      <div class="toolbar" id="hotelBar" hidden>
+        <div class="sorts">
+          <button class="chip active" data-kind="">Все</button>
+          <button class="chip" data-kind="hotel">Отели</button>
+          <button class="chip" data-kind="hostel">Хостелы</button>
+          <button class="chip" data-kind="guest_house">Гостевые дома</button>
+          <button class="chip" data-kind="apartment">Апартаменты</button>
+        </div>
+      </div>
+      <div id="hotelMsg" class="msg"></div>
+      <div class="split">
+        <div id="hotelList" class="list"></div>
+        <div class="map-box"><div id="map"></div></div>
+      </div>
+      <div class="empty" id="hotelEmpty">
+        <div class="empty-ico">🏨</div>
+        <h3>Где остановиться?</h3>
+        <p>Выберите билет или введите город — покажем реальные отели на карте.</p>
+      </div>
+    </section>
+
+    <section id="cars" class="panel">
+      <div class="toolbar">
+        <div class="sorts" id="carClasses"></div>
+      </div>
+      <div id="carMsg" class="msg"></div>
+      <div id="carList" class="grid"></div>
+    </section>
+
+    <section id="account" class="panel">
+      <div class="acc">
+        <div class="acc-side">
+          <div class="card-box profile-card">
+            <div class="avatar" id="accAvatar"></div>
+            <h3 id="accName"></h3>
+            <small id="accEmail"></small>
+            <small class="note" id="accSince"></small>
+          </div>
+          <nav class="acc-nav" id="accNav">
+            <button data-tab="trips" class="active">🧳 Мои поездки <b id="cntTrips"></b></button>
+            <button data-tab="orders">🧾 Заказы <b id="cntOrders"></b></button>
+            <button data-tab="bookings">🚗 Брони авто <b id="cntBookings"></b></button>
+            <button data-tab="profile">👤 Профиль</button>
+            <button data-tab="security">🔒 Безопасность</button>
+            <button id="logoutBtn" class="danger">↩ Выйти</button>
+          </nav>
+        </div>
+        <div class="acc-main">
+          <div class="acc-tab active" data-tab="trips"><h2>Мои поездки</h2><div id="tripsList" class="list"></div></div>
+          <div class="acc-tab" data-tab="orders"><h2>Заказы</h2><div id="ordersList" class="list"></div></div>
+          <div class="acc-tab" data-tab="bookings"><h2>Брони автомобилей</h2><div id="bookingsList" class="list"></div></div>
+          <div class="acc-tab" data-tab="profile">
+            <h2>Профиль</h2>
+            <form id="profileForm" class="card-box form-col">
+              <label class="fl">Имя<input name="name" required></label>
+              <label class="fl">Телефон<input name="phone" type="tel" placeholder="+996 555 000 000"></label>
+              <label class="fl">Email<input name="email" disabled></label>
+              <button class="btn">Сохранить</button>
+            </form>
+          </div>
+          <div class="acc-tab" data-tab="security">
+            <h2>Смена пароля</h2>
+            <form id="passwordForm" class="card-box form-col">
+              <label class="fl">Текущий пароль<input name="old" type="password" required autocomplete="current-password"></label>
+              <label class="fl">Новый пароль<input name="new" type="password" required minlength="6" autocomplete="new-password"></label>
+              <button class="btn">Изменить пароль</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <aside class="trip-box" id="tripBox">
+    <h4>Ваша поездка</h4>
+    <div class="trip-row" id="tripFlight"><span class="ti">✈️</span><div><b>Перелёт</b><small>не выбран</small></div></div>
+    <div class="trip-row" id="tripHotel"><span class="ti">🏨</span><div><b>Отель</b><small>не выбран</small></div></div>
+    <div class="trip-row" id="tripCar"><span class="ti">🚗</span><div><b>Автомобиль</b><small>не выбран</small></div></div>
+    <div class="trip-total"><span>Итого</span><b id="tripTotal">0 сом</b></div>
+    <small class="note">Цена отеля уточняется у отеля</small>
+    <button class="go full save-trip" id="checkout" disabled>Оформить заказ</button>
+    <small class="note center" id="checkoutHint">Выберите билет, отель и автомобиль</small>
+    <button class="btn ghost full" id="saveTrip">Сохранить поездку</button>
+  </aside>
+</main>
+
+<dialog id="carDlg">
+  <form id="carForm" method="dialog">
+    <button type="button" class="x" id="carCancel">×</button>
+    <div class="dlg-car" id="carHead"></div>
+    <div class="two">
+      <label class="fl">Получение<input type="date" name="date_from" required></label>
+      <label class="fl">Возврат<input type="date" name="date_to" required></label>
+    </div>
+    <label class="fl">Имя и фамилия<input name="name" required placeholder="Иван Иванов"></label>
+    <label class="fl">Телефон<input name="phone" required placeholder="+7 900 000-00-00" type="tel"></label>
+    <div class="dlg-sum"><span id="carDays"></span><b id="carTotal"></b></div>
+    <button class="go full">Забронировать</button>
+    <small class="note">Оплата при получении автомобиля. Бесплатная отмена за 24 часа.</small>
+  </form>
+</dialog>
+
+<dialog id="authDlg">
+  <form id="authForm" method="dialog">
+    <button type="button" class="x" id="authClose">×</button>
+    <div class="auth-tabs">
+      <button type="button" data-mode="login" class="active">Вход</button>
+      <button type="button" data-mode="register">Регистрация</button>
+    </div>
+    <p class="note" id="authHint">Войдите, чтобы сохранять поездки и видеть свои брони</p>
+    <label class="fl reg-only">Имя<input name="name" autocomplete="name"></label>
+    <label class="fl">Email<input name="email" type="email" required autocomplete="email"></label>
+    <label class="fl">Пароль<input name="password" type="password" required minlength="6" autocomplete="current-password"></label>
+    <div class="msg err" id="authErr"></div>
+    <button class="go full" id="authSubmit">Войти</button>
+  </form>
+</dialog>
+
+<dialog id="orderDlg">
+  <div class="order-ok">
+    <div class="ok-ico">✓</div>
+    <h2>Заказ оформлен</h2>
+    <p class="note">Номер заказа</p>
+    <div class="order-num" id="orderNum"></div>
+    <div class="dlg-sum"><span>Итого к оплате</span><b id="orderTotal"></b></div>
+    <a class="go full" id="orderPdf" target="_blank" rel="noopener">📄 Открыть отчёт PDF</a>
+    <button class="btn ghost full" id="orderAccount">Мои заказы</button>
+    <button class="btn ghost full" id="orderClose">Закрыть</button>
+  </div>
+</dialog>
+
+<div class="toast" id="toast"></div>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <div><a class="logo" href="/"><span class="logo-mark">✈</span>путник</a><p>Учебный проект. Билеты — данные Aviasales, отели — OpenStreetMap.</p></div>
+    <div><b>Сервисы</b><a data-go="tickets">Авиабилеты</a><a data-go="hotels">Отели</a><a data-go="cars">Аренда авто</a></div>
+    <div><b>Помощь</b><a>Как купить билет</a><a>Возврат и обмен</a><a>Контакты</a></div>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
